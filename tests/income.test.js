@@ -3,8 +3,10 @@ process.env.NODE_ENV = "test";
 const server = require("../server");
 const incomeService = require("../services/income");
 const request = require("supertest");
+const toBeType = require("jest-tobetype");
 const log = require("log4js").getLogger("test:income");
 log.level = "debug";
+expect.extend(toBeType);
 
 describe("Income API", () => {
   afterEach(async () => {
@@ -17,10 +19,11 @@ describe("Income API", () => {
       const res = await request(server).get("/api/v1/incomes");
       expect(res.statusCode).toBe(200);
       expect(res.statusCode).toBe(200);
-      expect(typeof res.body).toBe("object");
       expect(res.body).toHaveProperty("success", true);
-      // res.body.should.have.property("data").to.be.an("array");
-      // expect(res.body).toHaveProperty("data").toBe("array");
+      expect(typeof res.body).toBe("object");
+      // * for some reason using typeOf can't dig inside object (res.body.data)
+      // so i install 3rd party library to check data type more cleaner
+      expect(res.body.data).toBeType("array");
     });
 
     it("It should NOT GET all the income", async () => {
